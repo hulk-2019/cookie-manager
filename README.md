@@ -99,7 +99,7 @@ The extension requires the following permissions:
 
 ### File Structure
 ```
-cookie-manager-extension/
+cookie-manager/
 ├── manifest.json          # Extension manifest
 ├── background.js          # Background service worker
 ├── popup.html            # Popup interface

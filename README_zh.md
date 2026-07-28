@@ -99,7 +99,7 @@
 
 ### 文件结构
 ```
-cookie-manager-extension/
+cookie-manager/
 ├── manifest.json          # 扩展清单文件
 ├── background.js          # 后台服务工作线程
 ├── popup.html            # 弹出界面

@@ -1,5 +1,5 @@
 {
-  "name": "cookie-manager-extension",
+  "name": "cookie-manager",
   "version": "1.0.0",
   "private": true,
   "description": "Chrome extension for managing website cookies",
