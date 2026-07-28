@@ -1,26 +1,27 @@
 简体中文 | [English](/README.md)
 
-# 🎨 Cookie管理小工具 (Cookie Manager)
+# 🍪 Cookie管理工具（Cookie Manager）
 
 <div align="center">
-  <img src="/public/example.png" alt="Cookie Manager" width="400"/>
+  <img src="./public/example.png" alt="Cookie Manager 图标" width="600" />
   <br>
   <br>
 </div>
 
 ---
 
-一款功能强大的浏览器扩展，用于管理网站Cookie，支持新增、编辑、删除、清空以及批量导入Cookie功能。
+一款轻量的 Chrome/Edge 浏览器扩展，用于查看和管理网站 Cookie，支持新增、编辑、删除、搜索、JSON 导入导出及域名筛选。
 
 ## 功能特点
 
 - 🍪 **Cookie管理**：查看、添加、编辑和删除任何网站的Cookie
-- ⚡ **批量导入**：支持通过JSON格式批量导入多个Cookie
-- 🌍 **国际化支持**：支持中英文切换（默认英文）
+- 📥 **JSON导入**：支持选择 `.json` 文件或粘贴JSON内容批量导入
+- 📤 **JSON导出**：将当前所选域名的Cookie导出为可再次导入的JSON文件
+- 🌍 **国际化支持**：支持中英文切换，并根据浏览器地区/语言自动设置默认语言
 - 🔍 **搜索功能**：通过名称快速查找Cookie
 - 🌐 **域名支持**：跨不同域名和子域名管理Cookie
-- ⚡ **批量操作**：一键清空所有Cookie
-- 🎨 **现代UI**：简洁直观的卡片式弹出界面
+- ⚡ **批量操作**：一键清空所选域名的全部Cookie
+- 🎨 **现代UI**：紧凑直观的弹出界面，弹框标题与操作区固定显示
 - 🔒 **高级选项**：支持Secure、HttpOnly和SameSite属性
 - 📅 **过期控制**：为Cookie设置自定义过期时间
 - 🔄 **实时更新**：即时刷新Cookie列表
@@ -31,15 +32,10 @@
 1. 下载或克隆此仓库
 2. 打开Chrome/Edge浏览器，访问 `chrome://extensions/` 或 `edge://extensions/`
 3. 在右上角启用"开发者模式"
-4. 点击"加载已解压的扩展程序"，选择扩展目录
+4. 点击"加载已解压的扩展程序"，选择项目根目录或构建生成的 `dist/cookie-manager/` 目录
 5. 扩展图标将出现在浏览器工具栏中
 
-### Firefox浏览器
-1. 下载或克隆此仓库
-2. 打开Firefox浏览器，访问 `about:debugging`
-3. 点击"此Firefox" → "临时载入附加组件"
-4. 从扩展目录中选择 `manifest.json` 文件
-5. 扩展将被临时加载
+如需先生成分发包，请参考下方[构建](#构建)说明。
 
 ## 使用方法
 
@@ -47,12 +43,35 @@
 2. **查看Cookie**：弹出窗口将显示当前网站的所有Cookie
 3. **切换语言**：点击顶部的"中文 / EN"按钮切换语言
 4. **搜索Cookie**：使用搜索框按名称过滤Cookie
-5. **添加新Cookie**：点击"+ 新增Cookie"按钮并填写详细信息
-6. **批量导入**：点击"批量导入"按钮，输入JSON数据 (格式: `[{"name":"c1","value":"v1"},...]`)
-7. **编辑Cookie**：点击任何现有Cookie以修改其属性
-8. **删除Cookie**：点击Cookie旁边的删除按钮
-9. **清空所有**：使用"清空所有"按钮删除当前站点的所有Cookie
-10. **刷新**：点击"刷新"更新Cookie列表
+5. **添加新Cookie**：点击"新增Cookie"按钮并填写详细信息
+6. **导入Cookie**：点击"批量导入"，选择JSON文件或粘贴JSON内容后确认
+7. **导出Cookie**：点击"导出"，下载所选域名下的Cookie
+8. **编辑Cookie**：点击Cookie旁边的编辑按钮
+9. **删除Cookie**：点击Cookie旁边的删除按钮
+10. **清空所有**：点击垃圾桶图标，删除所选域名下的全部Cookie
+11. **刷新**：点击刷新图标重新加载Cookie列表
+
+## JSON格式
+
+导入内容必须是Cookie对象数组，其中 `name` 和 `value` 为必填字段，其他字段可选：
+
+```json
+[
+  {
+    "name": "session_id",
+    "value": "example-value",
+    "domain": ".example.com",
+    "path": "/",
+    "secure": true,
+    "httpOnly": true,
+    "sameSite": "lax",
+    "session": false,
+    "expirationDate": 1798761600
+  }
+]
+```
+
+导出文件使用相同格式，可直接重新导入。
 
 ## Cookie属性
 
@@ -74,8 +93,7 @@
 
 - `cookies`：访问和修改浏览器Cookie
 - `activeTab`：访问当前标签页信息
-- `storage`：存储扩展设置（如语言偏好）
-- `*://*/*`：访问所有网站的Cookie
+- `*://*/*` 主机权限：访问弹窗中所选网站的Cookie
 
 ## 开发信息
 
@@ -87,10 +105,25 @@ cookie-manager-extension/
 ├── popup.html            # 弹出界面
 ├── popup.css             # 弹出样式
 ├── popup.js              # 弹出功能
-├── icon16.png            # 16x16扩展图标
-├── icon48.png            # 48x48扩展图标
-└── icon128.png           # 128x128扩展图标
+├── locales/
+│   ├── en.js             # 英文语言包
+│   └── zh.js             # 中文语言包
+├── package.json          # npm 脚本与开发依赖
+├── scripts/
+│   └── build.js          # Node.js 构建脚本（打包扩展到 dist/）
+└── public/
+    └── icon.png          # 透明背景扩展图标
 ```
+
+### 构建
+需要 Node.js 22 或更高版本。
+
+```bash
+npm ci
+npm run build
+```
+
+构建产物：未打包扩展目录 `dist/cookie-manager/`，以及可分发的压缩包 `dist/cookie-manager-v<version>.zip`。
 
 ### 使用技术
 - HTML5、CSS3、JavaScript (ES6+)
@@ -101,13 +134,13 @@ cookie-manager-extension/
 
 - ✅ Chrome（清单V3）
 - ✅ Edge（清单V3）
-- ⚠️ Firefox（清单V2/V3 - 可能需要调整）
+- ⚠️ 其他Chromium内核浏览器可能可用，但尚未专门测试
 
 ## 隐私与安全
 
 - 所有Cookie操作都在您的浏览器本地执行
 - 不会向外部服务器发送任何数据
-- 扩展仅访问您访问的网站Cookie
+- 导入和导出的JSON文件均在本地处理
 - 遵循浏览器扩展安全最佳实践
 
 ## 贡献指南

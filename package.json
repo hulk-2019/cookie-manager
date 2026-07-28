@@ -1,0 +1,15 @@
+{
+  "name": "cookie-manager-extension",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Chrome extension for managing website cookies",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "node scripts/build.js"
+  },
+  "devDependencies": {
+    "archiver": "^7.0.1"
+  }
+}

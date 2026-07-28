@@ -22,10 +22,26 @@
     </div>
 
     <div class="actions">
-      <button id="add-cookie" class="btn btn-primary" data-i18n="addCookie">+ Add Cookie</button>
-      <button id="import-cookies" class="btn btn-info" data-i18n="importCookies">Batch Import</button>
-      <button id="clear-all" class="btn btn-danger" data-i18n="clearAll">🗑️ Clear All</button>
-      <button id="refresh" class="btn btn-secondary" data-i18n="refresh">🔄 Refresh</button>
+      <button id="add-cookie" class="btn btn-primary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        <span data-i18n="addCookie">Add Cookie</span>
+      </button>
+      <button id="import-cookies" class="btn btn-tonal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+        <span data-i18n="importCookies">Import</span>
+      </button>
+      <button id="export-cookies" class="btn btn-tonal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+        <span data-i18n="exportCookies">Export</span>
+      </button>
+      <div class="actions-right">
+        <button id="refresh" class="btn btn-secondary btn-icon" title="Refresh" data-i18n-title="refresh">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M20.49 15a9 9 0 0 1-14.85 3.36L1 14"/></svg>
+        </button>
+        <button id="clear-all" class="btn btn-danger-soft btn-icon" title="Clear All" data-i18n-title="clearAll">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M10 11v6M14 11v6"/></svg>
+        </button>
+      </div>
     </div>
 
     <div class="search-box">
@@ -102,9 +118,20 @@
         </div>
         <div class="modal-body">
           <div class="form-group">
-            <label for="import-json">JSON Data *</label>
-            <textarea id="import-json" placeholder='[{"name":"cookie1","value":"value1"},{"name":"cookie2","value":"value2"}]' style="height: 200px;"></textarea>
-            <div class="hint" style="font-size: 12px; color: #666; margin-top: 5px;">
+            <label data-i18n="importFromFile">Import from JSON file</label>
+            <input type="file" id="import-file" accept=".json,application/json" hidden>
+            <button type="button" id="import-file-btn" class="file-picker">
+              <span class="file-picker-icon">📄</span>
+              <span class="file-picker-text">
+                <span id="file-picker-label" data-i18n="chooseFile">Click to select a JSON file</span>
+                <span class="file-picker-hint" data-i18n="orPasteBelow">or paste JSON content below</span>
+              </span>
+            </button>
+          </div>
+          <div class="form-group">
+            <label for="import-json"><span data-i18n="jsonData">JSON Data</span> *</label>
+            <textarea id="import-json" class="import-textarea" placeholder='[{"name":"cookie1","value":"value1"},{"name":"cookie2","value":"value2"}]'></textarea>
+            <div class="form-hint" data-i18n="importHint">
               Format: JSON array of cookie objects. Required fields: name, value. Optional: domain, path, secure, etc.
             </div>
           </div>
@@ -117,6 +144,8 @@
     </div>
   </div>
 
+  <script src="locales/en.js"></script>
+  <script src="locales/zh.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>

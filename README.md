@@ -1,26 +1,27 @@
 English | [简体中文](/README_zh.md)
 
-# 🎨 Cookie Manager
+# 🍪 Cookie Manager
 
 <div align="center">
-  <img src="/public/example.png" alt="Cookie Manager" width="400"/>
+  <img src="./public/example.png" alt="Cookie Manager icon" width="600"/>
   <br>
   <br>
 </div>
 
 ---
 
-A powerful browser extension for managing website cookies with support for adding, editing, deleting, clearing, and batch importing cookies.
+A lightweight Chrome/Edge extension for viewing and managing website cookies. It supports adding, editing, deleting, searching, JSON import/export, and domain-level filtering.
 
 ## Features
 
 - 🍪 **Cookie Management**: View, add, edit, and delete cookies for any website
-- ⚡ **Batch Import**: Import multiple cookies at once via JSON format
-- 🌍 **Internationalization**: Support English and Chinese (switchable)
+- 📥 **JSON Import**: Import cookies from a `.json` file or pasted JSON
+- 📤 **JSON Export**: Export cookies for the selected domain to a reusable JSON file
+- 🌍 **Internationalization**: English and Chinese with automatic browser-locale detection and manual switching
 - 🔍 **Search Functionality**: Quickly find cookies by name
 - 🌐 **Domain Support**: Manage cookies across different domains and subdomains
-- ⚡ **Batch Operations**: Clear all cookies at once with one click
-- 🎨 **Modern UI**: Clean and intuitive popup interface with card style design
+- ⚡ **Batch Operations**: Clear all cookies for the selected domain with one click
+- 🎨 **Modern UI**: Compact popup UI with fixed modal headers and action bars
 - 🔒 **Advanced Options**: Support for Secure, HttpOnly, and SameSite attributes
 - 📅 **Expiration Control**: Set custom expiration dates for cookies
 - 🔄 **Real-time Updates**: Refresh cookie list instantly
@@ -31,15 +32,10 @@ A powerful browser extension for managing website cookies with support for addin
 1. Download or clone this repository
 2. Open Chrome/Edge and navigate to `chrome://extensions/` or `edge://extensions/`
 3. Enable "Developer mode" in the top right corner
-4. Click "Load unpacked" and select the extension directory
+4. Click "Load unpacked" and select either the project root or the generated `dist/cookie-manager/` directory
 5. The extension icon will appear in your browser toolbar
 
-### Firefox
-1. Download or clone this repository
-2. Open Firefox and navigate to `about:debugging`
-3. Click "This Firefox" → "Load Temporary Add-on"
-4. Select the `manifest.json` file from the extension directory
-5. The extension will be loaded temporarily
+To create a distribution package first, follow the [Build](#build) instructions below.
 
 ## Usage
 
@@ -47,12 +43,35 @@ A powerful browser extension for managing website cookies with support for addin
 2. **View Cookies**: The popup will show all cookies for the current website
 3. **Switch Language**: Click "中文 / EN" in the header to switch language
 4. **Search Cookies**: Use the search box to filter cookies by name
-5. **Add New Cookie**: Click "+ Add Cookie" button and fill in the details
-6. **Batch Import**: Click "Import Cookies" to import JSON data (Format: `[{"name":"c1","value":"v1"},...]`)
-7. **Edit Cookie**: Click on any existing cookie to modify its properties
-8. **Delete Cookie**: Click the delete button next to any cookie
-9. **Clear All**: Use "Clear All" button to remove all cookies for the current site
-10. **Refresh**: Click "Refresh" to update the cookie list
+5. **Add New Cookie**: Click "Add Cookie" and fill in the details
+6. **Import Cookies**: Click "Import", select a JSON file or paste JSON content, then confirm
+7. **Export Cookies**: Click "Export" to download cookies for the selected domain
+8. **Edit Cookie**: Click the edit button next to a cookie
+9. **Delete Cookie**: Click the delete button next to a cookie
+10. **Clear All**: Click the trash icon to remove all cookies for the selected domain
+11. **Refresh**: Click the refresh icon to reload the cookie list
+
+## JSON Format
+
+Import accepts an array of cookie objects. `name` and `value` are required; other properties are optional:
+
+```json
+[
+  {
+    "name": "session_id",
+    "value": "example-value",
+    "domain": ".example.com",
+    "path": "/",
+    "secure": true,
+    "httpOnly": true,
+    "sameSite": "lax",
+    "session": false,
+    "expirationDate": 1798761600
+  }
+]
+```
+
+Exported files use the same format and can be imported directly.
 
 ## Cookie Properties
 
@@ -74,8 +93,7 @@ The extension requires the following permissions:
 
 - `cookies`: Access and modify browser cookies
 - `activeTab`: Access current tab information
-- `storage`: Store extension settings (like language preference)
-- `*://*/*`: Access cookies across all websites
+- `*://*/*` host permission: Access cookies across websites selected in the popup
 
 ## Development
 
@@ -87,10 +105,25 @@ cookie-manager-extension/
 ├── popup.html            # Popup interface
 ├── popup.css             # Popup styles
 ├── popup.js              # Popup functionality
-├── icon16.png            # 16x16 extension icon
-├── icon48.png            # 48x48 extension icon
-└── icon128.png           # 128x128 extension icon
+├── locales/
+│   ├── en.js             # English locale
+│   └── zh.js             # Chinese locale
+├── package.json          # npm scripts and dev dependencies
+├── scripts/
+│   └── build.js          # Node.js build script (packages the extension into dist/)
+└── public/
+    └── icon.png          # Transparent extension icon
 ```
+
+### Build
+Requires Node.js 22 or later.
+
+```bash
+npm ci
+npm run build
+```
+
+Outputs an unpacked extension at `dist/cookie-manager/` and a distributable zip at `dist/cookie-manager-v<version>.zip`.
 
 ### Technologies Used
 - HTML5, CSS3, JavaScript (ES6+)
@@ -101,13 +134,13 @@ cookie-manager-extension/
 
 - ✅ Chrome (Manifest V3)
 - ✅ Edge (Manifest V3)
-- ⚠️ Firefox (Manifest V2/V3 - may require adjustments)
+- ⚠️ Other Chromium-based browsers may work but are not explicitly tested
 
 ## Privacy & Security
 
 - All cookie operations are performed locally in your browser
 - No data is sent to external servers
-- Extension only accesses cookies for websites you visit
+- Imported and exported JSON files are processed locally
 - Follows browser extension security best practices
 
 ## Contributing

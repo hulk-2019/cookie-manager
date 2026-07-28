@@ -3,7 +3,7 @@
   "name": "Cookie Manager",
   "version": "1.0",
   "description": "Manage website Cookies - Supports add, edit, delete, and clear functions.",
-  "permissions": ["cookies"],
+  "permissions": ["activeTab", "cookies"],
   "host_permissions": [
     "*://*/*"
   ],
@@ -15,8 +15,8 @@
     "service_worker": "background.js"
   },
   "icons": {
-    "16": "icon16.png",
-    "48": "icon48.png",
-    "128": "icon128.png"
+    "16": "public/icon.png",
+    "48": "public/icon.png",
+    "128": "public/icon.png"
   }
 }

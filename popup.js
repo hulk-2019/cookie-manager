@@ -1,95 +1,4 @@
-const locales = {
-  en: {
-    title: "Cookie Manager",
-    addCookie: "+ Add Cookie",
-    importCookies: "Import Cookies",
-    clearAll: "Clear All",
-    refresh: "Refresh",
-    searchPlaceholder: "Search cookies...",
-    loading: "Loading cookies...",
-    emptyStateTitle: "No Cookies Found",
-    emptyStateDesc: "No cookies found for this domain",
-    modalAddTitle: "Add Cookie",
-    modalEditTitle: "Edit Cookie",
-    modalImportTitle: "Batch Import Cookies",
-    name: "Name",
-    value: "Value",
-    domain: "Domain",
-    path: "Path",
-    expiration: "Expiration",
-    secure: "Secure",
-    httpOnly: "HttpOnly",
-    session: "Session Cookie",
-    sameSite: "SameSite",
-    save: "Save",
-    cancel: "Cancel",
-    import: "Import",
-    successAdd: "Cookie added successfully",
-    successEdit: "Cookie updated successfully",
-    successDelete: "Cookie deleted successfully",
-    successClear: "All cookies cleared",
-    successImport: "Cookies imported successfully",
-    errorLoad: "Failed to load cookies",
-    errorSave: "Failed to save cookie",
-    errorDelete: "Failed to delete cookie",
-    errorClear: "Failed to clear cookies",
-    errorImport: "Failed to import cookies",
-    confirmDelete: "Are you sure you want to delete cookie '{name}'?",
-    confirmClear: "Are you sure you want to clear all cookies for domain '{domain}'?",
-    invalidJson: "Invalid JSON format",
-    domainCurrent: "Current Domain",
-    domainParent: "Parent Domain (including subdomains)",
-    domainRoot: "Root Domain (including all subdomains)",
-    edit: "Edit",
-    delete: "Delete",
-    langSwitch: "中文 / EN"
-  },
-  zh: {
-    title: "Cookie管理小工具",
-    addCookie: "+ 新增Cookie",
-    importCookies: "批量导入",
-    clearAll: "清空所有",
-    refresh: "刷新",
-    searchPlaceholder: "搜索Cookie名称...",
-    loading: "正在加载Cookie...",
-    emptyStateTitle: "暂无Cookie",
-    emptyStateDesc: "当前域名下没有找到任何Cookie",
-    modalAddTitle: "新增Cookie",
-    modalEditTitle: "编辑Cookie",
-    modalImportTitle: "批量导入Cookie",
-    name: "名称",
-    value: "值",
-    domain: "域名",
-    path: "路径",
-    expiration: "过期时间",
-    secure: "Secure",
-    httpOnly: "HttpOnly",
-    session: "Session Cookie",
-    sameSite: "SameSite",
-    save: "保存",
-    cancel: "取消",
-    import: "导入",
-    successAdd: "Cookie已添加",
-    successEdit: "Cookie已更新",
-    successDelete: "Cookie已删除",
-    successClear: "已清空所有Cookie",
-    successImport: "Cookie导入成功",
-    errorLoad: "加载Cookie失败",
-    errorSave: "保存Cookie失败",
-    errorDelete: "删除Cookie失败",
-    errorClear: "清空Cookie失败",
-    errorImport: "导入Cookie失败",
-    confirmDelete: "确定要删除Cookie '{name}' 吗？",
-    confirmClear: "确定要清空域名 '{domain}' 下的所有Cookie吗？",
-    invalidJson: "JSON格式无效",
-    domainCurrent: "当前域名",
-    domainParent: "父域名 (包含子域名)",
-    domainRoot: "根域名 (包含所有子域名)",
-    edit: "编辑",
-    delete: "删除",
-    langSwitch: "English / 中文"
-  }
-};
+// locales 由 locales/ 目录下的语言包文件提供（在 popup.html 中先于本文件加载）
 
 class CookieManager {
   constructor() {
@@ -114,7 +23,25 @@ class CookieManager {
     const savedLang = localStorage.getItem('cookieManagerLang')
     if (savedLang && (savedLang === 'en' || savedLang === 'zh')) {
       this.currentLang = savedLang
+      return
     }
+    this.currentLang = this.detectDefaultLanguage()
+  }
+
+  // 中国大陆/香港/澳门/台湾默认为中文，其他地区默认为英语
+  detectDefaultLanguage() {
+    const uiLang = (chrome.i18n && chrome.i18n.getUILanguage && chrome.i18n.getUILanguage())
+      || navigator.language
+      || 'en'
+    const parts = uiLang.toLowerCase().split('-')
+    if (parts[0] !== 'zh') return 'en'
+
+    // 可能的格式: zh / zh-cn / zh-tw / zh-hk / zh-mo / zh-hans-cn / zh-hant-tw ...
+    const region = parts[parts.length - 1]
+    if (parts.length === 1 || ['cn', 'hk', 'mo', 'tw', 'hans', 'hant'].includes(region)) {
+      return 'zh'
+    }
+    return 'en'
   }
 
   saveLanguage(lang) {
@@ -146,6 +73,12 @@ class CookieManager {
       const key = el.getAttribute('data-i18n-placeholder')
       if (locales[this.currentLang][key]) {
         el.placeholder = locales[this.currentLang][key]
+      }
+    })
+    document.querySelectorAll('[data-i18n-title]').forEach(el => {
+      const key = el.getAttribute('data-i18n-title')
+      if (locales[this.currentLang][key]) {
+        el.title = locales[this.currentLang][key]
       }
     })
   }
@@ -317,6 +250,31 @@ class CookieManager {
         this.showImportModal()
     })
 
+    // Export Event
+    document.getElementById("export-cookies").addEventListener("click", () => {
+        this.exportCookies()
+    })
+
+    // Import from file: fill the textarea with the selected file's content
+    document.getElementById("import-file-btn").addEventListener("click", () => {
+        document.getElementById("import-file").click()
+    })
+
+    document.getElementById("import-file").addEventListener("change", (e) => {
+        const file = e.target.files[0]
+        if (!file) return
+        const reader = new FileReader()
+        reader.onload = () => {
+            document.getElementById("import-json").value = reader.result
+            document.getElementById("file-picker-label").textContent = file.name
+            document.getElementById("import-file-btn").classList.add("has-file")
+        }
+        reader.onerror = () => {
+            this.showError(this.t('errorReadFile'))
+        }
+        reader.readAsText(file)
+    })
+
     document.getElementById("do-import").addEventListener("click", () => {
         this.importCookies()
     })
@@ -426,6 +384,9 @@ class CookieManager {
   showImportModal() {
       document.getElementById("import-modal").style.display = "block"
       document.getElementById("import-json").value = ""
+      document.getElementById("import-file").value = ""
+      document.getElementById("file-picker-label").textContent = this.t('chooseFile')
+      document.getElementById("import-file-btn").classList.remove("has-file")
   }
 
   hideImportModal() {
@@ -570,6 +531,44 @@ class CookieManager {
       } catch (e) {
           this.showError(this.t('invalidJson') + ": " + e.message);
       }
+  }
+
+  exportCookies() {
+      if (!this.cookies.length) {
+          this.showError(this.t('errorExport'))
+          return
+      }
+
+      // Keep the same fields accepted by the import feature
+      const data = this.cookies.map((cookie) => {
+          const item = {
+              name: cookie.name,
+              value: cookie.value,
+              domain: cookie.domain,
+              path: cookie.path,
+              secure: cookie.secure,
+              httpOnly: cookie.httpOnly,
+              sameSite: cookie.sameSite,
+              session: cookie.session
+          }
+          if (cookie.expirationDate) {
+              item.expirationDate = cookie.expirationDate
+          }
+          return item
+      })
+
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      const domain = this.selectedDomain.replace(/^\./, "")
+      const date = new Date().toISOString().slice(0, 10)
+      a.href = url
+      a.download = `cookies-${domain}-${date}.json`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+      this.showSuccess(this.t('successExport') + ` (${data.length})`)
   }
 
   async setCookie(cookieData) {
